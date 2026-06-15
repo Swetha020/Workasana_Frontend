@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const [newUser, setNewUser] = useState({
@@ -16,16 +17,19 @@ export default function SignUp() {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://workasana-backend-omega.vercel.app/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
+      const response = await fetch(
+        "https://workasana-backend-omega.vercel.app/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        },
+      );
       const data = await response.json();
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-                toast.success("Registration success.! Welcome to workasana");
+        toast.success("Registration success.! Welcome to workasana");
 
         navigate("/dashboard/home");
       } else {
