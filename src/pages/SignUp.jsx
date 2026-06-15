@@ -31,7 +31,7 @@ export default function SignUp() {
         localStorage.setItem("token", data.token);
         toast.success("Registration success.! Welcome to workasana");
 
-        navigate("/dashboard/home");
+        navigate("/home");
       } else {
         toast.error(data.message || "Registration failed");
       }
