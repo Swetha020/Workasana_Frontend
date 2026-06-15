@@ -116,17 +116,17 @@ export default function Dashboard() {
   });
 
   const userTasks = filteredTasks?.filter((task) =>
-    task.owners.some((owner) => owner.name === user.name),
+    task.owners?.some((owner) => owner.name === user.name),
   );
 
   const otherTasks = filteredTasks?.filter(
-    (task) => !task.owners.some((owner) => owner.name === user.name),
+    (task) => !task.owners?.some((owner) => owner.name === user?.name),
   );
 
   const filteredProjects = projects?.filter((project) => {
     if (!searchText) return true;
     return (
-      project.name?.toLowerCase().includes(searchText) ||
+      project.name?.toLowerCase()?.includes(searchText) ||
       project.description?.toLowerCase().includes(searchText)
     );
   });
