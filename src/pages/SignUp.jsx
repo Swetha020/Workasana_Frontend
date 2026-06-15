@@ -29,6 +29,9 @@ export default function SignUp() {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setUser(data.user);
+
         toast.success("Registration success.! Welcome to workasana");
 
         navigate("/home");

@@ -5,6 +5,7 @@ import "./ProjectDetail.css";
 import TaskModal from "../components/TaskModal";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loader from "../components/Loader";
 
 export default function ProjectDetail() {
   const projectId = useParams().projectId;
@@ -16,7 +17,9 @@ export default function ProjectDetail() {
     data: project,
     loading,
     error,
-  } = useFetch(`https://workasana-backend-omega.vercel.app/projects/${projectId}`);
+  } = useFetch(
+    `https://workasana-backend-omega.vercel.app/projects/${projectId}`,
+  );
 
   const [task, setTask] = useState({
     name: "",
@@ -88,7 +91,12 @@ export default function ProjectDetail() {
       });
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   if (error) return <p>Error loading project</p>;
 
   return (
@@ -100,7 +108,7 @@ export default function ProjectDetail() {
       <h1 className="mt-3">{project?.name}</h1>
       <p className="text-secondary">{project?.description}</p>
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-        <div className="">
+        <div className="d-flex gap-2 mt-3 flex-wrap">
           <p>Sort By:</p>
           <div className="d-flex gap-3 align-items-center flex-wrap">
             <p
@@ -171,67 +179,80 @@ export default function ProjectDetail() {
           </thead>
 
           <tbody>
-            {sortedTasks?.map((task) => (
-              <tr key={task._id}>
-                <td className="fw-semibold">{task.name}</td>
-                <td>
-                  <div className="d-flex owners-data">
-                    {task.owners.map((owner) => (
-                      <span key={owner._id} className="owner-avatar">
-                        {owner.name.slice(0, 1).toUpperCase()}
-                      </span>
-                    ))}
+            {sortedTasks.length > 0 ? (
+              sortedTasks?.map((task) => (
+                <tr key={task._id}>
+                  <td className="fw-semibold">{task.name}</td>
+                  <td>
+                    <div className="d-flex owners-data">
+                      {task.owners.map((owner) => (
+                        <span key={owner._id} className="owner-avatar">
+                          {owner.name.slice(0, 1).toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+
+                  <td>
+                    <span
+                      className={`badge rounded-pill ${
+                        task.priority === "High"
+                          ? "text-bg-danger"
+                          : task.priority === "Medium"
+                            ? "text-bg-warning"
+                            : "text-bg-secondary"
+                      }`}
+                    >
+                      {task.priority}
+                    </span>
+                  </td>
+
+                  <td>
+                    {new Date(task.dueDate).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </td>
+
+                  <td>
+                    <span
+                      className={`badge ${
+                        task.status === "Completed"
+                          ? "text-bg-success"
+                          : task.status === "In Progress"
+                            ? "text-bg-warning"
+                            : task.status === "Blocked"
+                              ? "text-bg-danger"
+                              : "text-bg-primary"
+                      }`}
+                    >
+                      {task.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    <Link
+                      className="btn btn-sm btn-light"
+                      to={`/tasks/${task._id}`}
+                    >
+                      →
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center py-5">
+                  <div className="d-flex flex-column align-items-center justify-content-center">
+                    <h5 className="mt-2 mb-0">No tasks found</h5>
+                    <p className="text-muted">
+                      Try changing filters or create a new task
+                    </p>
                   </div>
                 </td>
-
-                <td>
-                  <span
-                    className={`badge rounded-pill ${
-                      task.priority === "High"
-                        ? "text-bg-danger"
-                        : task.priority === "Medium"
-                          ? "text-bg-warning"
-                          : "text-bg-secondary"
-                    }`}
-                  >
-                    {task.priority}
-                  </span>
-                </td>
-
-                <td>
-                  {new Date(task.dueDate).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </td>
-
-                <td>
-                  <span
-                    className={`badge ${
-                      task.status === "Done"
-                        ? "text-bg-success"
-                        : task.status === "In Progress"
-                          ? "text-bg-warning"
-                          : task.status === "Blocked"
-                            ? "text-bg-danger"
-                            : "text-bg-primary"
-                    }`}
-                  >
-                    {task.status}
-                  </span>
-                </td>
-
-                <td>
-                  <Link
-                    className="btn btn-sm btn-light"
-                    to={`/tasks/${task._id}`}
-                  >
-                    →
-                  </Link>
-                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

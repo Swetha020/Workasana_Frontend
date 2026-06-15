@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { toast } from "react-toastify";
-
+import Loader from "../components/Loader";
 export default function Settings() {
   const { user } = useUserContext();
   const [passwordData, setPasswordData] = useState({
@@ -52,7 +52,7 @@ export default function Settings() {
   };
 
   if (!user) {
-    return <p>Loading...</p>;
+    return <p><Loader/></p>;
   }
 
   return (

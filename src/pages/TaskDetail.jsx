@@ -3,6 +3,7 @@ import useFetch from "../hooks/useFetch";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useUserContext } from "../contexts/UserContext";
 
 export default function TaskDetail() {
   const taskId = useParams().taskId;
@@ -15,24 +16,32 @@ export default function TaskDetail() {
     `https://workasana-backend-omega.vercel.app/tasks/${taskId}`,
   );
 
+  const { user } = useUserContext();
+
   const updateStatus = async (status) => {
     try {
-      await fetch(`https://workasana-backend-omega.vercel.app/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      await fetch(
+        `https://workasana-backend-omega.vercel.app/tasks/${taskId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+          }),
         },
-        body: JSON.stringify({
-          status,
-        }),
-      });
+      );
       toast.success("Task Status Updated");
       refetch();
     } catch (error) {
       toast.error("Failed to Update Status");
-
       console.error(error);
     }
+  };
+
+  const isOwner = () => {
+    return taskData?.owners?.some((owner) => owner?.name === user?.name);
   };
 
   return (
@@ -48,8 +57,8 @@ export default function TaskDetail() {
               <hr />
               <div className="row g-3">
                 <div className="col-12 col-md-6">
-                  <p>Project: {taskData.project.name}</p>
-                  <p>Team: {taskData.team.name}</p>
+                  <p>Project: {taskData.project?.name}</p>
+                  <p>Team: {taskData.team?.name}</p>
                   <p>
                     Owners:{" "}
                     {taskData.owners.map((owner) => owner.name).join(", ")}{" "}
@@ -75,6 +84,8 @@ export default function TaskDetail() {
                     className="form-select w-100 d-inline me-3"
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
+                    disabled={!isOwner()}
+                    style={{cursor:"pointer"}}
                   >
                     <option value="" disabled>
                       Change Status
@@ -88,7 +99,11 @@ export default function TaskDetail() {
                   <button
                     className="btn btn-primary w-100"
                     onClick={() => updateStatus(selectedStatus)}
-                    disabled={selectedStatus === taskData.status}
+                    disabled={
+                      !selectedStatus ||
+                      selectedStatus === taskData.status ||
+                      !isOwner()
+                    }
                   >
                     Update Status
                   </button>
@@ -97,7 +112,7 @@ export default function TaskDetail() {
                   <button
                     className="btn btn-success px-3 me-5"
                     onClick={() => updateStatus("Completed")}
-                    disabled={taskData.status === "Completed"}
+                    disabled={taskData.status === "Completed" || !isOwner()}
                   >
                     Mark As Complete
                   </button>

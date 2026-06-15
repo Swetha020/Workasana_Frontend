@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { CgCalendar } from "react-icons/cg";
 import { toast } from "react-toastify";
+import Loader from "../components/Loader";
 
 export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -116,11 +117,11 @@ export default function Dashboard() {
   });
 
   const userTasks = filteredTasks?.filter((task) =>
-    task.owners?.some((owner) => owner.name === user.name),
+    task.owners?.some((owner) => owner?.name === user?.name),
   );
 
   const otherTasks = filteredTasks?.filter(
-    (task) => !task.owners?.some((owner) => owner.name === user?.name),
+    (task) => !task.owners?.some((owner) => owner?.name === user?.name),
   );
 
   const filteredProjects = projects?.filter((project) => {
@@ -130,6 +131,14 @@ export default function Dashboard() {
       project.description?.toLowerCase().includes(searchText)
     );
   });
+
+  if (!user)
+    return (
+      <p>
+        Loading
+        <Loader />
+      </p>
+    );
 
   return (
     <>
@@ -179,8 +188,11 @@ export default function Dashboard() {
           </div>
         </div>
         <div>
-          {projectsLoading && <p>Loading projects...!</p>}
-          {filteredProjects && (
+          {projectsLoading ? (
+            <p>
+              <Loader />
+            </p>
+          ) : filteredProjects?.length > 0 ? (
             <div className="row">
               {filteredProjects?.map((project) => (
                 <div className="col-12 col-md-4" key={project._id}>
@@ -196,6 +208,13 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="text-center m-5">
+              <hr />
+
+              <p className="display-6">No Projects Found</p>
+              <hr />
             </div>
           )}
         </div>
@@ -242,8 +261,11 @@ export default function Dashboard() {
         </div>
         <div>
           <h2 className="mt-4">My Tasks</h2>
-          {tasksLoading && <p>Loading Tasks...!</p>}
-          {userTasks && (
+          {tasksLoading ? (
+            <p>
+              <Loader />
+            </p>
+          ) : userTasks?.length > 0 ? (
             <div className="row">
               {userTasks?.map((task) => (
                 <div className="col-12 col-md-4" key={task._id}>
@@ -289,14 +311,22 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="text-center m-5">
+              <hr />
+
+              <p className="display-6">No Tasks Found</p>
+              <hr />
+            </div>
           )}
           <h2 className="my-4">Other Tasks</h2>
-          {otherTasks && (
+          {otherTasks?.length > 0 ? (
             <div className="row">
               {otherTasks?.map((task) => (
                 <div className="col-12 col-md-4" key={task._id}>
                   <div
                     className={`card task-card ${priorityColor[task?.priority] || ""}`}
+                    onClick={() => navigate(`/tasks/${task._id}`)}
                   >
                     <div className="card-body">
                       <div className="d-flex justify-content-between align-items-center">
@@ -316,7 +346,7 @@ export default function Dashboard() {
                           year: "numeric",
                         })}
                       </p>
-                      <p className="ms-1">
+                      <p className="d-flex ms-1">
                         {task?.owners.map((owner) => (
                           <span className="members-pill">
                             {owner.name.slice(0, 1)}{" "}
@@ -334,6 +364,13 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="text-center m-5">
+              <hr />
+
+              <p className="display-6">No Tasks Found</p>
+              <hr />
             </div>
           )}
         </div>
