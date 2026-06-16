@@ -52,7 +52,7 @@ export default function Settings() {
   };
 
   if (!user) {
-    return <p><Loader/></p>;
+    return <div><Loader/></div>;
   }
 
   return (
