@@ -9,6 +9,7 @@ export default function Teams() {
     data: teams,
     loading,
     error,
+    refetch,
   } = useFetch("https://workasana-backend-omega.vercel.app/teams");
 
   const [team, setTeam] = useState({
@@ -27,7 +28,14 @@ export default function Teams() {
       body: JSON.stringify(team),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data.message));
+      .then((data) => {
+        setTeam({
+          name: "",
+          members: [],
+          description: "",
+        });
+        refetch();
+      });
   };
 
   return (
@@ -36,7 +44,7 @@ export default function Teams() {
         <div className="mb-4 mx-2">
           <h1 className="mt-4 mb-0">Teams</h1>
           <p className="text-secondary">
-           View and Manage teams and team members
+            View and Manage teams and team members
           </p>
         </div>{" "}
         <hr />
@@ -44,7 +52,7 @@ export default function Teams() {
           {teams?.map((team) => (
             <div className="col-12 col-md-4">
               <div
-                className="card"
+                className="card m-2"
                 onClick={() => navigate(`/teams/${team._id}`)}
                 style={{ cursor: "pointer" }}
               >
@@ -64,7 +72,7 @@ export default function Teams() {
           ))}
           <div className="col-12 col-md-4">
             <div
-              className="card h-100 cursor-pointer"
+              className="card newTeam-card cursor-pointer m-2"
               role="button"
               data-bs-toggle="modal"
               data-bs-target="#teamModal"
