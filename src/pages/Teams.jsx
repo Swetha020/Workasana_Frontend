@@ -3,8 +3,11 @@ import TeamModal from "../components/TeamModal";
 import useFetch from "../hooks/useFetch";
 import "./Teams.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Teams() {
+  const [showModal, setShowModal] = useState(false);
+
   const {
     data: teams,
     loading,
@@ -34,6 +37,8 @@ export default function Teams() {
           members: [],
           description: "",
         });
+        toast.success("New Team Added");
+        setShowModal(false);
         refetch();
       });
   };
@@ -74,9 +79,10 @@ export default function Teams() {
             <div
               className="card newTeam-card cursor-pointer m-2"
               role="button"
-              data-bs-toggle="modal"
-              data-bs-target="#teamModal"
+              // data-bs-toggle="modal"
+              // data-bs-target="#teamModal"
               style={{ cursor: "pointer" }}
+              onClick={() => setShowModal(true)}
             >
               <div className="card-body d-flex align-items-center justify-content-center">
                 <h4>+ Add New Team</h4>
@@ -87,6 +93,8 @@ export default function Teams() {
               team={team}
               setTeam={setTeam}
               handleTeamSubmit={handleTeamSubmit}
+              show={showModal}
+              onClose={() => setShowModal()}
             />
           </div>
         </div>

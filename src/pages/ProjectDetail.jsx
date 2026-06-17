@@ -12,6 +12,7 @@ export default function ProjectDetail() {
   const [sortType, setSortType] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const filterStatus = searchParams.get("status") || "";
+  const [showModal, setShowModal] = useState(false);
 
   const {
     data: project,
@@ -83,6 +84,7 @@ export default function ProjectDetail() {
           priority: "",
         });
         toast.success("New Task Added");
+        setShowModal(false)
         refetchTasks();
       })
       .catch((error) => {
@@ -153,8 +155,9 @@ export default function ProjectDetail() {
           </select>
           <button
             className="btn btn-primary w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#taskModal"
+            onClick={() => setShowModal(true)}
+            // data-bs-toggle="modal"
+            // data-bs-target="#taskModal"
           >
             + New Task
           </button>
@@ -162,6 +165,8 @@ export default function ProjectDetail() {
             task={task}
             setTask={setTask}
             handleTaskSubmit={handleTaskSubmit}
+            show={showModal}
+            onClose={() => setShowModal(false)}
           />
         </div>
       </div>

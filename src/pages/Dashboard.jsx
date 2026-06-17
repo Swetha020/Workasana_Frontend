@@ -25,6 +25,8 @@ export default function Dashboard() {
     dueDate: "",
     priority: "",
   });
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
 
   const { user } = useUserContext();
   const navigate = useNavigate();
@@ -54,6 +56,7 @@ export default function Dashboard() {
         console.log(data);
         setProject({ name: "", description: "" });
         toast.success("New Project Added");
+        setShowProjectModal(false);
         refetchProjects();
       })
       .catch((e) => toast.error("Failed to add Project "));
@@ -79,6 +82,7 @@ export default function Dashboard() {
           priority: "",
         });
         toast.success("New Task Added");
+        setShowTaskModal(false);
         refetchTasks();
       })
       .catch((e) => toast.error("Failed to add Task "));
@@ -134,10 +138,9 @@ export default function Dashboard() {
 
   if (!user)
     return (
-      <p>
-        Loading
+      <div>
         <Loader />
-      </p>
+      </div>
     );
 
   return (
@@ -175,8 +178,9 @@ export default function Dashboard() {
             <h1 className="me-4 ">Projects</h1>
             <button
               className="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#projectModal"
+              // data-bs-toggle="modal"
+              // data-bs-target="#projectModal"
+              onClick={() => setShowProjectModal(true)}
             >
               + New Project
             </button>
@@ -184,14 +188,16 @@ export default function Dashboard() {
               project={project}
               setProject={setProject}
               handleProjectSubmit={handleProjectSubmit}
+              show={showProjectModal}
+              onClose={() => setShowProjectModal(false)}
             />
           </div>
         </div>
         <div>
           {projectsLoading ? (
-            <p>
+            <div>
               <Loader />
-            </p>
+            </div>
           ) : filteredProjects?.length > 0 ? (
             <div className="row">
               {filteredProjects?.map((project) => (
@@ -248,8 +254,9 @@ export default function Dashboard() {
 
           <button
             className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#taskModal"
+            // data-bs-toggle="modal"
+            // data-bs-target="#taskModal"
+            onClick={() => setShowTaskModal(true)}
           >
             + New Task
           </button>
@@ -257,14 +264,16 @@ export default function Dashboard() {
             task={task}
             setTask={setTask}
             handleTaskSubmit={handleTaskSubmit}
+            show={showTaskModal}
+            onClose={() => setShowTaskModal(false)}
           />
         </div>
         <div>
           <h2 className="mt-4">My Tasks</h2>
           {tasksLoading ? (
-            <p>
+            <div>
               <Loader />
-            </p>
+            </div>
           ) : userTasks?.length > 0 ? (
             <div className="row">
               {userTasks?.map((task) => (

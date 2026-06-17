@@ -3,6 +3,7 @@ import useFetch from "../hooks/useFetch";
 import { useState } from "react";
 import TeamModal from "../components/TeamModal";
 import { toast } from "react-toastify";
+import Loader from "../components/Loader";
 
 export default function TeamDetail() {
   const { teamId } = useParams();
@@ -10,23 +11,28 @@ export default function TeamDetail() {
     `https://workasana-backend-omega.vercel.app/teams/${teamId}`,
   );
   const [team, setTeam] = useState({ name: "", description: "", members: [] });
+  const [showModal, setShowModal] = useState(false);
 
   if (!teamData) {
-    return <h2>Loading...</h2>;
+    return <div className="m-5"><Loader/></div>;
   }
 
   const handleTeamSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`https://workasana-backend-omega.vercel.app/teams/${team._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `https://workasana-backend-omega.vercel.app/teams/${team._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(team),
       },
-      body: JSON.stringify(team),
-    });
+    );
     if (response.ok) {
-      toast.success("New Member Added")
+      toast.success("Team Members Updated");
+      setShowModal(false);
       refetch();
     }
   };
@@ -52,8 +58,8 @@ export default function TeamDetail() {
           ))}
         </ul>
         <button
-          data-bs-toggle="modal"
-          data-bs-target="#teamModal"
+          // data-bs-toggle="modal"
+          // data-bs-target="#teamModal"
           onClick={() => {
             setTeam({
               _id: teamData._id,
@@ -61,6 +67,7 @@ export default function TeamDetail() {
               description: teamData.description,
               members: teamData.members.map((member) => member._id),
             });
+            setShowModal(true);
           }}
           className="btn btn-primary mt-2"
         >
@@ -70,6 +77,8 @@ export default function TeamDetail() {
           team={team}
           setTeam={setTeam}
           handleTeamSubmit={handleTeamSubmit}
+          show={showModal}
+          onClose={() => setShowModal()}
           isEdit={Boolean(team._id)}
         />
       </div>
